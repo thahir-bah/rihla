@@ -1,0 +1,46 @@
+version: '3.1'
+
+services:
+
+  mongodb:
+    container_name: mongodb-container
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: Rihla_db 
+
+    ports:
+      - 27017:27017
+    volumes:
+      - db_data:/data/db
+
+  backend:
+    container_name: django-container
+    image: django-docker:0.0.1
+    build: ./backend
+    restart: always
+    ports:
+      - 8000:8000
+    depends_on:
+      - mongodb
+    volumes:
+      - .:/app
+    # command: >
+    #   sh -c "python manage.py makemigrations &&
+    #        python manage.py migrate"
+
+  frontend:
+    container_name: react-container
+    image: react-docker:0.0.1
+    build: ./front-end
+    restart: always
+    ports:
+      - 3000:3000
+    depends_on:
+      - backend
+
+
+volumes:
+  db_data:
